@@ -11,6 +11,8 @@
 [![npm bundle size](https://img.shields.io/badge/gzipped-1.2KB-blue)](https://bundlephobia.com/package/@andrewbro/luxify)
 [![license](https://img.shields.io/npm/l/@andrewbro/luxify)](LICENSE)
 
+**[Documentation](https://luxify.andrewbro.com)** · **[Live demo](https://toopost.us)**
+
 ## Your Website's Night Light
 
 **Stop hurting your eyes while browsing at night.** 
