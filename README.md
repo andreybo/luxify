@@ -45,7 +45,7 @@ Already have a dark mode? `luxify` is the perfect companion. Layer it on top:
 
 ```tsx
 import { useState } from 'react';
-import { FluxProvider, FluxOverlay } from 'luxify/react';
+import { FluxProvider, FluxOverlay } from '@andrewbro/luxify/react';
 
 export function App() {
   const [isDark, setIsDark] = useState(false);
@@ -79,7 +79,7 @@ const [isDark, setIsDark] = useState(false);
 ## Installation
 
 ```bash
-npm install luxify
+npm install @andrewbro/luxify
 ```
 
 If you want the React API, install React 18+ in your app as usual.
@@ -89,7 +89,7 @@ If you want the React API, install React 18+ in your app as usual.
 ### Vanilla JS
 
 ```ts
-import { createFlux } from 'luxify';
+import { createFlux } from '@andrewbro/luxify';
 
 const flux = createFlux({
   intensity: 0.25,
@@ -108,10 +108,10 @@ flux.destroy();
 
 ### React
 
-React exports live under `luxify/react` to keep the core entry lightweight for non-React sites.
+React exports live under `@andrewbro/luxify/react` to keep the core entry lightweight for non-React sites.
 
 ```tsx
-import { FluxOverlay, FluxProvider } from 'luxify/react';
+import { FluxOverlay, FluxProvider } from '@andrewbro/luxify/react';
 
 function App() {
   return (
@@ -124,7 +124,7 @@ function App() {
 ```
 
 ```tsx
-import { useFlux } from 'luxify/react';
+import { useFlux } from '@andrewbro/luxify/react';
 
 function Page() {
   const { toggle, setIntensity } = useFlux();
@@ -145,7 +145,7 @@ Use the React API in a client component.
 ```tsx
 'use client';
 
-import { FluxOverlay, FluxProvider } from 'luxify/react';
+import { FluxOverlay, FluxProvider } from '@andrewbro/luxify/react';
 
 export function NightLightShell({ children }: { children: React.ReactNode }) {
   return (

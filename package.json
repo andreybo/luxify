@@ -1,5 +1,5 @@
 {
-  "name": "luxify",
+  "name": "@andrewbro/luxify",
   "version": "0.1.0",
   "description": "Overlay-based night light for websites with vanilla JS and React APIs.",
   "license": "MIT",
