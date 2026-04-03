@@ -8,7 +8,7 @@
 ```
 
 [![npm](https://img.shields.io/npm/v/@andrewbro/luxify)](https://www.npmjs.com/package/@andrewbro/luxify)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@andrewbro/luxify)](https://bundlephobia.com/package/@andrewbro/luxify)
+[![npm bundle size](https://img.shields.io/badge/gzipped-1.2KB-blue)](https://bundlephobia.com/package/@andrewbro/luxify)
 [![license](https://img.shields.io/npm/l/@andrewbro/luxify)](LICENSE)
 
 ## Your Website's Night Light
