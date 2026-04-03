@@ -29,6 +29,10 @@ It's 10 PM. You're checking email, reading docs, or browsing your dashboard. You
 
 Ready to care about your users' eyes?
 
+## Live Demo
+
+See it in action at **[toopost.us](https://toopost.us/)** — toggle night mode directly in the app.
+
 ## Perfect For
 
 **Reading-heavy websites** where users spend hours:
