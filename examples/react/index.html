@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>page-flux React demo</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: radial-gradient(circle at top, #f6e6d4, #d3e2f2 60%, #afc4d6);
+      }
+
+      #root {
+        width: min(560px, calc(100vw - 32px));
+        padding: 32px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.76);
+        box-shadow: 0 18px 48px rgba(20, 37, 63, 0.18);
+      }
+
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        background: #1d3557;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+  </html>
