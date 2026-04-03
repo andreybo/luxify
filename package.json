@@ -36,6 +36,14 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreybo/luxify.git"
+  },
+  "homepage": "https://github.com/andreybo/luxify#readme",
+  "bugs": {
+    "url": "https://github.com/andreybo/luxify/issues"
+  },
   "keywords": [
     "night-light",
     "flux",
