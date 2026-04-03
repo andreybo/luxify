@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>luxify — Your Website's Night Light</title>
+  <meta name="description" content="Overlay-based night light for websites. Vanilla JS + React. 1.2KB gzipped. Zero dependencies." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0e0d;
+      --bg2: #161412;
+      --bg3: #1e1b18;
+      --border: #2a2520;
+      --text: #e8e0d5;
+      --text2: #a09080;
+      --accent: #ffb76b;
+      --accent2: #ff9a3c;
+      --code-bg: #1a1714;
+      --radius: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    /* OVERLAY DEMO */
+    #demo-overlay {
+      position: fixed;
+      inset: 0;
+      background: #ffb76b;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: opacity 300ms ease;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15,14,13,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-links .btn-nav {
+      background: var(--accent);
+      color: #1a0f00;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .nav-links .btn-nav:hover { background: var(--accent2); color: #1a0f00; }
+
+    /* HERO */
+    .hero {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 96px 24px 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,183,107,0.12);
+      border: 1px solid rgba(255,183,107,0.25);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 7vw, 64px);
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text2);
+      max-width: 540px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #1a0f00;
+    }
+
+    .btn-primary:hover { background: var(--accent2); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { border-color: var(--text2); }
+
+    /* DEMO TOGGLE */
+    .demo-bar {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .demo-label {
+      font-size: 14px;
+      color: var(--text2);
+    }
+
+    .demo-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input { display: none; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      transition: all 0.2s;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: var(--text2);
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .toggle-switch input:checked ~ .toggle-track {
+      background: rgba(255,183,107,0.2);
+      border-color: var(--accent);
+    }
+
+    .toggle-switch input:checked ~ .toggle-thumb {
+      transform: translateX(22px);
+      background: var(--accent);
+    }
+
+    .intensity-slider {
+      -webkit-appearance: none;
+      width: 120px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .intensity-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    /* FEATURES */
+    .features {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 72px 24px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    /* INSTALL */
+    .install-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 72px;
+    }
+
+    .install-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+    }
+
+    .install-box span { color: var(--accent); }
+
+    .copy-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover { color: var(--text); border-color: var(--text2); }
+
+    /* DOCS */
+    .docs {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px 96px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px;
+      width: fit-content;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text2);
+      border: none;
+      background: transparent;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* CODE BLOCK */
+    .code-block {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .code-block pre {
+      background: var(--code-bg) !important;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .code-block .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+    }
+
+    /* API TABLE */
+    .api-section { margin-bottom: 40px; }
+
+    .api-section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .api-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .api-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--bg2);
+      color: var(--text2);
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .api-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .api-table tr:last-child td { border-bottom: none; }
+
+    .api-table code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      background: rgba(255,183,107,0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .api-table .type {
+      color: #7dd3fc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .api-table .default {
+      color: var(--text2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--text2);
+      font-size: 14px;
+    }
+
+    footer a { color: var(--text2); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    /* UTIL */
+    .hljs { background: transparent !important; }
+
+    @media (max-width: 600px) {
+      .nav-links li:not(:last-child) { display: none; }
+      .demo-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="demo-overlay"></div>
+
+<nav>
+  <a class="nav-logo" href="#">luxify</a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#quickstart">Quickstart</a></li>
+    <li><a href="#api">API</a></li>
+    <li><a href="https://github.com/andreybo/luxify" target="_blank">GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/@andrewbro/luxify" target="_blank" class="btn-nav">npm</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✦ 1.2KB gzipped · Zero dependencies</div>
+  <h1>Your website's<br /><span>night light</span></h1>
+  <p>A warm overlay that protects your users' eyes at night. One line of code. Works with Vanilla JS, React, and Next.js.</p>
+  <div class="hero-actions">
+    <a href="#quickstart" class="btn btn-primary">Get started →</a>
+    <a href="https://toopost.us" target="_blank" class="btn btn-secondary">Live demo ↗</a>
+  </div>
+</section>
+
+<!-- DEMO BAR -->
+<div class="demo-bar">
+  <span class="demo-label">Try it right here →</span>
+  <div class="demo-toggle">
+    <label class="toggle-switch">
+      <input type="checkbox" id="demo-toggle-input" />
+      <div class="toggle-track"></div>
+      <div class="toggle-thumb"></div>
+    </label>
+    <span class="demo-label" id="demo-status">Off</span>
+  </div>
+  <div class="demo-toggle">
+    <span class="demo-label">Intensity</span>
+    <input type="range" class="intensity-slider" id="intensity-input" min="0" max="60" value="22" />
+    <span class="demo-label" id="intensity-value">0.22</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">Why luxify</div>
+  <div class="section-title">Built for real-world websites</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">✨</div>
+      <h3>Effortless setup</h3>
+      <p>One function call. No plugins, no build config changes, no CSS imports.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Non-intrusive</h3>
+      <p><code>pointer-events: none</code> means clicks, modals, forms, and scrolling all work perfectly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>1.2KB gzipped</h3>
+      <p>Zero runtime dependencies. TypeScript-first with full type exports.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔄</div>
+      <h3>Auto-scheduling</h3>
+      <p>Enable at 19:00, disable at 07:00. Custom timezones supported.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💾</div>
+      <h3>Persistence</h3>
+      <p>Optionally save state to <code>localStorage</code> so users don't have to re-enable each visit.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">♿</div>
+      <h3>Accessible</h3>
+      <p>Respects <code>prefers-reduced-motion</code>. SSR-safe — no DOM access on the server.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section class="install-section" id="quickstart">
+  <div class="section-label">Installation</div>
+  <div class="section-title">Get started in 30 seconds</div>
+  <div class="install-box">
+    <span>npm install <span>@andrewbro/luxify</span></span>
+    <button class="copy-btn" onclick="copyText('npm install @andrewbro/luxify', this)">Copy</button>
+  </div>
+</section>
+
+<!-- DOCS -->
+<section class="docs" id="quickstart-code">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('vanilla', this)">Vanilla JS</button>
+    <button class="tab" onclick="switchTab('react', this)">React</button>
+    <button class="tab" onclick="switchTab('nextjs', this)">Next.js</button>
+    <button class="tab" onclick="switchTab('scheduling', this)">Scheduling</button>
+  </div>
+
+  <div class="tab-content active" id="tab-vanilla">
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+      <pre><code class="language-typescript">import { createFlux } from '@andrewbro/luxify';
+
+const flux = createFlux({
+  intensity: 0.25,   // 0–1, how warm/dark the overlay is
+  color: '#ffb45c',  // any valid CSS color
+  autoEnable: true,  // enable immediately
+  persist: true      // remember state in localStorage
+});
+
+// Control it programmatically
+flux.enable();
+flux.disable();
+flux.toggle();
+flux.setIntensity(0.4);
+flux.setColor('#ff9f43');
+flux.destroy();</code></pre>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-react">
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+      <pre><code class="language-tsx">import { FluxProvider, FluxOverlay, useFlux } from '@andrewbro/luxify/react';
+
+function App() {
+  return (
+    &lt;FluxProvider options={{ persist: true }}&gt;
+      &lt;FluxOverlay intensity={0.25} color="#ffb45c" /&gt;
+      &lt;Page /&gt;
+    &lt;/FluxProvider&gt;
+  );
+}
+
+function Page() {
+  const { toggle, setIntensity } = useFlux();
+  return (
+    &lt;div&gt;
+      &lt;button onClick={toggle}&gt;Toggle night mode&lt;/button&gt;
+      &lt;button onClick={() =&gt; setIntensity(0.35)}&gt;Make it warmer&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-nextjs">
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+      <pre><code class="language-tsx">'use client';
+
+import { FluxProvider, FluxOverlay } from '@andrewbro/luxify/react';
+
+export function NightLightShell({ children }: { children: React.ReactNode }) {
+  return (
+    &lt;FluxProvider options={{ persist: true }}&gt;
+      &lt;FluxOverlay
+        intensity={0.22}
+        color="#ffb76b"
+        schedule={{ from: '19:00', to: '07:00', timeZone: 'Europe/Warsaw' }}
+      /&gt;
+      {children}
+    &lt;/FluxProvider&gt;
+  );
+}
+
+// In layout.tsx
+export default function RootLayout({ children }) {
+  return (
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;NightLightShell&gt;{children}&lt;/NightLightShell&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-scheduling">
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+      <pre><code class="language-typescript">// Enable from 19:00 to 07:00 automatically
+createFlux({
+  schedule: {
+    from: '19:00',
+    to: '07:00',
+    timeZone: 'America/New_York' // optional, defaults to browser TZ
+  }
+});
+
+// Or use a fully custom callback
+createFlux({
+  shouldEnable: ({ hour }) => hour >= 19 || hour < 7
+});
+
+// Combine with React
+&lt;FluxOverlay
+  schedule={{ from: '20:00', to: '06:00' }}
+  intensity={0.3}
+/&gt;</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section class="docs" id="api">
+  <div class="section-label">Reference</div>
+  <div class="section-title">API</div>
+
+  <div class="api-section">
+    <h3>createFlux(options?)</h3>
+    <table class="api-table">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>intensity</code></td>
+          <td><span class="type">number</span></td>
+          <td><span class="default">0.22</span></td>
+          <td>Overlay opacity, 0–1</td>
+        </tr>
+        <tr>
+          <td><code>color</code></td>
+          <td><span class="type">string</span></td>
+          <td><span class="default">'#ffb76b'</span></td>
+          <td>Any valid CSS color</td>
+        </tr>
+        <tr>
+          <td><code>autoEnable</code></td>
+          <td><span class="type">boolean</span></td>
+          <td><span class="default">false</span></td>
+          <td>Enable overlay on creation</td>
+        </tr>
+        <tr>
+          <td><code>persist</code></td>
+          <td><span class="type">boolean</span></td>
+          <td><span class="default">false</span></td>
+          <td>Save state to localStorage</td>
+        </tr>
+        <tr>
+          <td><code>schedule</code></td>
+          <td><span class="type">{ from, to, timeZone? }</span></td>
+          <td><span class="default">—</span></td>
+          <td>Auto-enable between two times (HH:MM)</td>
+        </tr>
+        <tr>
+          <td><code>shouldEnable</code></td>
+          <td><span class="type">(ctx) =&gt; boolean</span></td>
+          <td><span class="default">—</span></td>
+          <td>Custom enable logic callback</td>
+        </tr>
+        <tr>
+          <td><code>zIndex</code></td>
+          <td><span class="type">number</span></td>
+          <td><span class="default">2147483646</span></td>
+          <td>CSS z-index of the overlay</td>
+        </tr>
+        <tr>
+          <td><code>transitionDuration</code></td>
+          <td><span class="type">number</span></td>
+          <td><span class="default">240</span></td>
+          <td>Fade transition in ms</td>
+        </tr>
+        <tr>
+          <td><code>respectReducedMotion</code></td>
+          <td><span class="type">boolean</span></td>
+          <td><span class="default">true</span></td>
+          <td>Disable transitions for users who prefer reduced motion</td>
+        </tr>
+        <tr>
+          <td><code>id</code></td>
+          <td><span class="type">string</span></td>
+          <td><span class="default">'luxify-overlay'</span></td>
+          <td>DOM element ID — reused across instances</td>
+        </tr>
+        <tr>
+          <td><code>storageKey</code></td>
+          <td><span class="type">string</span></td>
+          <td><span class="default">'luxify'</span></td>
+          <td>localStorage key for persisted state</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="api-section">
+    <h3>Controller methods</h3>
+    <table class="api-table">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Returns</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>enable()</code></td><td><span class="type">void</span></td><td>Show the overlay</td></tr>
+        <tr><td><code>disable()</code></td><td><span class="type">void</span></td><td>Hide the overlay</td></tr>
+        <tr><td><code>toggle()</code></td><td><span class="type">void</span></td><td>Toggle visibility</td></tr>
+        <tr><td><code>setIntensity(value)</code></td><td><span class="type">void</span></td><td>Update opacity (0–1)</td></tr>
+        <tr><td><code>setColor(color)</code></td><td><span class="type">void</span></td><td>Update overlay color</td></tr>
+        <tr><td><code>isEnabled()</code></td><td><span class="type">boolean</span></td><td>Current visibility state</td></tr>
+        <tr><td><code>getState()</code></td><td><span class="type">FluxState</span></td><td>Returns <code>{ enabled, intensity, color }</code></td></tr>
+        <tr><td><code>update(options)</code></td><td><span class="type">void</span></td><td>Update multiple options at once</td></tr>
+        <tr><td><code>destroy()</code></td><td><span class="type">void</span></td><td>Remove overlay from DOM and stop scheduler</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="https://www.npmjs.com/package/@andrewbro/luxify" target="_blank">npm</a> ·
+    <a href="https://github.com/andreybo/luxify" target="_blank">GitHub</a> ·
+    <a href="https://toopost.us" target="_blank">Live demo</a> ·
+    MIT License
+  </p>
+</footer>
+
+<script>
+  hljs.highlightAll();
+
+  // DEMO OVERLAY
+  const overlay = document.getElementById('demo-overlay');
+  const toggle = document.getElementById('demo-toggle-input');
+  const status = document.getElementById('demo-status');
+  const intensityInput = document.getElementById('intensity-input');
+  const intensityValue = document.getElementById('intensity-value');
+
+  function updateOverlay() {
+    const on = toggle.checked;
+    const val = intensityInput.value / 100;
+    overlay.style.opacity = on ? val : 0;
+    status.textContent = on ? 'On' : 'Off';
+    intensityValue.textContent = val.toFixed(2);
+  }
+
+  toggle.addEventListener('change', updateOverlay);
+  intensityInput.addEventListener('input', updateOverlay);
+
+  // TABS
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // COPY
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 1500);
+    });
+  }
+
+  function copyBlock(btn) {
+    const code = btn.closest('.code-block').querySelector('code').innerText;
+    copyText(code, btn);
+  }
+</script>
+
+</body>
+</html>
